@@ -7,12 +7,11 @@ export const dynamic = 'force-dynamic'
 const CACHE_KEY = 'indicators'
 const CACHE_TTL = 300_000
 
-const SYMBOLS = [
+const YAHOO_SYMBOLS = [
   { symbol: 'CL=F', name: 'WTI Oil' },
   { symbol: 'GC=F', name: 'Gold' },
   { symbol: '^VIX', name: 'VIX' },
   { symbol: '^GSPC', name: 'S&P 500' },
-  { symbol: 'BTC-USD', name: 'Bitcoin' },
 ]
 
 async function fetchQuote(symbol: string, name: string): Promise<MarketIndicator | null> {
@@ -46,6 +45,27 @@ async function fetchQuote(symbol: string, name: string): Promise<MarketIndicator
   }
 }
 
+async function fetchBinanceBTC(): Promise<MarketIndicator | null> {
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT', {
+      signal: AbortSignal.timeout(5000),
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+
+    return {
+      symbol: 'BTCUSDT',
+      name: 'BTC',
+      price: Math.round(parseFloat(data.lastPrice) * 100) / 100,
+      change: Math.round(parseFloat(data.priceChange) * 100) / 100,
+      changePercent: Math.round(parseFloat(data.priceChangePercent) * 100) / 100,
+      timestamp: new Date(data.closeTime).toISOString(),
+    }
+  } catch {
+    return null
+  }
+}
+
 export async function GET() {
   try {
     const cached = getCached<MarketIndicator[]>(CACHE_KEY)
@@ -55,9 +75,10 @@ export async function GET() {
       })
     }
 
-    const results = await Promise.allSettled(
-      SYMBOLS.map(s => fetchQuote(s.symbol, s.name))
-    )
+    const results = await Promise.allSettled([
+      ...YAHOO_SYMBOLS.map(s => fetchQuote(s.symbol, s.name)),
+      fetchBinanceBTC(),
+    ])
 
     const indicators = results
       .map(r => r.status === 'fulfilled' ? r.value : null)

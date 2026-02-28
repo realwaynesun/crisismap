@@ -8,7 +8,6 @@ const SYMBOLS: Record<string, string> = {
   'GC=F': 'Gold',
   '^VIX': 'VIX',
   '^GSPC': 'S&P 500',
-  'BTC-USD': 'Bitcoin',
 }
 
 const BIG_MOVE_THRESHOLDS: Record<string, number> = {
@@ -16,7 +15,6 @@ const BIG_MOVE_THRESHOLDS: Record<string, number> = {
   'GC=F': 3,
   '^VIX': 15,
   '^GSPC': 3,
-  'BTC-USD': 8,
 }
 
 function hash(str: string): string {
