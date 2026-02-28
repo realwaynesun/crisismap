@@ -2,6 +2,7 @@
 
 import useSWR from 'swr'
 import type { ActorStatus } from '@/types'
+import { useLocale } from '@/lib/locale-context'
 import { ActorCard } from './actor-card'
 
 const fetcher = async (url: string) => {
@@ -16,11 +17,12 @@ export function ActorsPanel() {
   const { data, error, isLoading } = useSWR<ActorStatus[]>('/api/actors', fetcher, {
     refreshInterval: 300_000,
   })
+  const { dict } = useLocale()
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-[var(--text-secondary)]">
-        Loading actors...
+        {dict.actors.loading}
       </div>
     )
   }
@@ -28,7 +30,7 @@ export function ActorsPanel() {
   if (error) {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-[var(--accent-red)]">
-        Failed to load actors: {String(error.message ?? error)}
+        {dict.actors.error}: {String(error.message ?? error)}
       </div>
     )
   }
@@ -38,7 +40,7 @@ export function ActorsPanel() {
   if (!actors.length) {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-[var(--text-secondary)]">
-        No actor data available
+        {dict.actors.empty}
       </div>
     )
   }

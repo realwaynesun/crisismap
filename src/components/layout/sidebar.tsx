@@ -1,6 +1,7 @@
 'use client'
 
 import { useEventStore } from '@/stores/event-store'
+import { useLocale } from '@/lib/locale-context'
 import { useEvents } from '@/hooks/use-events'
 import { FeedFilters } from '@/components/feed/feed-filters'
 import { EventFeed } from '@/components/feed/event-feed'
@@ -8,15 +9,16 @@ import { TimelineView } from '@/components/feed/timeline-view'
 import { ActorsPanel } from '@/components/intel/actors-panel'
 import type { SidebarTab } from '@/types'
 
-const tabs: { id: SidebarTab; label: string }[] = [
-  { id: 'feed', label: 'Feed' },
-  { id: 'timeline', label: 'Timeline' },
-  { id: 'intel', label: 'Intel' },
-]
-
 export function Sidebar() {
   const activeTab = useEventStore((s) => s.activeTab)
   const setActiveTab = useEventStore((s) => s.setActiveTab)
+  const { dict } = useLocale()
+
+  const tabs: { id: SidebarTab; label: string }[] = [
+    { id: 'feed', label: dict.tabs.feed },
+    { id: 'timeline', label: dict.tabs.timeline },
+    { id: 'intel', label: dict.tabs.intel },
+  ]
 
   useEvents()
 

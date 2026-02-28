@@ -1,15 +1,17 @@
 'use client'
 
 import { useIndicators } from '@/hooks/use-indicators'
+import { useLocale } from '@/lib/locale-context'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 
 export function MarketStrip() {
   const { indicators, error, isLoading } = useIndicators()
+  const { dict } = useLocale()
 
   if (isLoading) {
     return (
       <div className="flex items-center gap-4 text-xs text-[var(--text-secondary)]">
-        Loading markets...
+        {dict.markets.loading}
       </div>
     )
   }
@@ -17,7 +19,7 @@ export function MarketStrip() {
   if (error) {
     return (
       <div className="flex items-center gap-4 text-xs text-[var(--accent-red)]">
-        Market data unavailable
+        {dict.markets.error}
       </div>
     )
   }

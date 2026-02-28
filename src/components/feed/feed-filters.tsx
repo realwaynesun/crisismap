@@ -1,6 +1,7 @@
 'use client'
 
 import { useEventStore } from '@/stores/event-store'
+import { useLocale } from '@/lib/locale-context'
 import { Search } from 'lucide-react'
 import type { EventCategory, ThreatLevel } from '@/types'
 
@@ -22,6 +23,7 @@ const levelColors: Record<ThreatLevel, string> = {
 export function FeedFilters() {
   const filters = useEventStore((s) => s.filters)
   const setFilters = useEventStore((s) => s.setFilters)
+  const { dict } = useLocale()
 
   const toggleCategory = (c: EventCategory) => {
     const next = filters.categories.includes(c)
@@ -43,7 +45,7 @@ export function FeedFilters() {
         <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
         <input
           type="text"
-          placeholder="Search events..."
+          placeholder={dict.filters.search}
           value={filters.search}
           onChange={(e) => setFilters({ search: e.target.value })}
           className="w-full pl-8 pr-3 py-1.5 rounded-md bg-[var(--bg-tertiary)] border border-[var(--border)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-blue)]"
@@ -61,7 +63,7 @@ export function FeedFilters() {
                 : 'border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--text-secondary)]'
             }`}
           >
-            {c}
+            {dict.categories[c] ?? c}
           </button>
         ))}
       </div>
@@ -78,7 +80,7 @@ export function FeedFilters() {
             }`}
             style={filters.levels.includes(l) ? { background: levelColors[l] } : undefined}
           >
-            {l}
+            {dict.levels[l] ?? l}
           </button>
         ))}
       </div>

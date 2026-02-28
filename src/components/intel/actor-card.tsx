@@ -1,10 +1,12 @@
 'use client'
 
 import type { ActorStatus } from '@/types'
+import { useLocale } from '@/lib/locale-context'
 import { timeAgo } from '@/lib/format'
 import { MessageSquare } from 'lucide-react'
 
 export function ActorCard({ actor }: { actor: ActorStatus }) {
+  const { dict } = useLocale()
   const hasStatement = !!actor.lastStatement
 
   return (
@@ -39,14 +41,14 @@ export function ActorCard({ actor }: { actor: ActorStatus }) {
             </p>
             {actor.lastStatementTime && (
               <span className="text-[10px] text-[var(--text-secondary)]">
-                {timeAgo(actor.lastStatementTime)}
+                {timeAgo(actor.lastStatementTime, { dict })}
               </span>
             )}
           </div>
         </div>
       ) : (
         <p className="text-[10px] text-[var(--accent-yellow)] italic">
-          No recent statements
+          {dict.actors.noStatements}
         </p>
       )}
     </div>

@@ -6,10 +6,20 @@ import type { MapRef } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEventStore } from '@/stores/event-store'
 import { useMapStore } from '@/stores/map-store'
+import { useLocale } from '@/lib/locale-context'
 import { MarkerDot } from './marker-dot'
 import { MarkerPopup } from './marker-popup'
 
 const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+
+const legendKeys = ['critical', 'high', 'medium', 'low', 'info'] as const
+const legendColors: Record<string, string> = {
+  critical: 'var(--accent-red)',
+  high: 'var(--accent-orange)',
+  medium: 'var(--accent-yellow)',
+  low: 'var(--accent-blue)',
+  info: 'var(--accent-green)',
+}
 
 export function CrisisMap() {
   const mapRef = useRef<MapRef>(null)
@@ -18,6 +28,7 @@ export function CrisisMap() {
   const select = useEventStore((s) => s.setSelectedEvent)
   const viewport = useMapStore((s) => s.viewport)
   const setViewport = useMapStore((s) => s.setViewport)
+  const { dict } = useLocale()
 
   const selectedEvent = events.find((e) => e.id === selectedId)
 
@@ -77,16 +88,10 @@ export function CrisisMap() {
       )}
     </Map>
     <div className="absolute bottom-3 right-3 bg-[var(--bg-secondary)]/90 border border-[var(--border)] rounded-lg px-3 py-2 text-[10px] flex flex-col gap-1">
-      {([
-        ['var(--accent-red)', 'Critical'],
-        ['var(--accent-orange)', 'High'],
-        ['var(--accent-yellow)', 'Medium'],
-        ['var(--accent-blue)', 'Low'],
-        ['var(--accent-green)', 'Info'],
-      ] as const).map(([color, label]) => (
-        <div key={label} className="flex items-center gap-1.5">
-          <span className="inline-block w-2.5 h-2.5 rounded-full border border-black/30" style={{ background: color }} />
-          <span className="text-[var(--text-secondary)]">{label}</span>
+      {legendKeys.map((key) => (
+        <div key={key} className="flex items-center gap-1.5">
+          <span className="inline-block w-2.5 h-2.5 rounded-full border border-black/30" style={{ background: legendColors[key] }} />
+          <span className="text-[var(--text-secondary)]">{dict.levels[key] ?? key}</span>
         </div>
       ))}
     </div>

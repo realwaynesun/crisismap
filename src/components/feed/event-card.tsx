@@ -3,6 +3,7 @@
 import type { CrisisEvent, EventCategory, ThreatLevel } from '@/types'
 import { useEventStore } from '@/stores/event-store'
 import { useMapStore } from '@/stores/map-store'
+import { useLocale } from '@/lib/locale-context'
 import { timeAgo } from '@/lib/format'
 import {
   Crosshair, MessageSquare, Shield, Handshake, TrendingUp,
@@ -33,6 +34,7 @@ export function EventCard({ event }: { event: CrisisEvent }) {
   const selectedId = useEventStore((s) => s.selectedEventId)
   const select = useEventStore((s) => s.setSelectedEvent)
   const flyTo = useMapStore((s) => s.flyTo)
+  const { dict } = useLocale()
 
   const Icon = categoryIcons[event.category]
   const dotColor = levelColors[event.level]
@@ -56,7 +58,7 @@ export function EventCard({ event }: { event: CrisisEvent }) {
         <span className="w-2 h-2 rounded-full shrink-0" style={{ background: dotColor }} />
         <Icon size={13} className="text-[var(--text-secondary)] shrink-0" />
         <span className="text-[10px] text-[var(--text-secondary)] ml-auto">
-          {timeAgo(event.timestamp)}
+          {timeAgo(event.timestamp, { dict })}
         </span>
       </div>
 

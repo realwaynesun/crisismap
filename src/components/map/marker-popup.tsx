@@ -1,10 +1,13 @@
 'use client'
 
 import type { CrisisEvent } from '@/types'
+import { useLocale } from '@/lib/locale-context'
 import { timeAgo } from '@/lib/format'
 import { ExternalLink, MapPin } from 'lucide-react'
 
 export function MarkerPopup({ event }: { event: CrisisEvent }) {
+  const { dict } = useLocale()
+
   return (
     <div className="max-w-xs">
       <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1 leading-snug">
@@ -20,7 +23,7 @@ export function MarkerPopup({ event }: { event: CrisisEvent }) {
           </span>
         )}
         <span>{event.source}</span>
-        <span>{timeAgo(event.timestamp)}</span>
+        <span>{timeAgo(event.timestamp, { dict })}</span>
       </div>
       {event.url && (
         <a
@@ -29,7 +32,7 @@ export function MarkerPopup({ event }: { event: CrisisEvent }) {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 mt-2 text-[10px] text-[var(--accent-blue)] hover:underline"
         >
-          Read article <ExternalLink size={10} />
+          {dict.map.readArticle} <ExternalLink size={10} />
         </a>
       )}
     </div>

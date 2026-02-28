@@ -1,14 +1,16 @@
 'use client'
 
 import { useMarkets } from '@/hooks/use-markets'
+import { useLocale } from '@/lib/locale-context'
 
 export function PolymarketPanel() {
   const { contracts, error, isLoading } = useMarkets()
+  const { dict } = useLocale()
 
   if (isLoading) {
     return (
       <div className="h-16 flex items-center justify-center text-xs text-[var(--text-secondary)] bg-[var(--bg-secondary)] border-t border-[var(--border)]">
-        Loading prediction markets...
+        {dict.polymarket.loading}
       </div>
     )
   }
@@ -16,7 +18,7 @@ export function PolymarketPanel() {
   if (error) {
     return (
       <div className="h-16 flex items-center justify-center text-xs text-[var(--accent-red)] bg-[var(--bg-secondary)] border-t border-[var(--border)]">
-        Prediction markets unavailable
+        {dict.polymarket.error}
       </div>
     )
   }

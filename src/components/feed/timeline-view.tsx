@@ -2,7 +2,8 @@
 
 import { useEventStore } from '@/stores/event-store'
 import { useMapStore } from '@/stores/map-store'
-import { formatHour } from '@/lib/format'
+import { useLocale } from '@/lib/locale-context'
+import { formatHour, formatDateTime } from '@/lib/format'
 import type { EventCategory } from '@/types'
 import {
   Crosshair, MessageSquare, Shield, Handshake, TrendingUp,
@@ -32,12 +33,14 @@ export function TimelineView() {
   const fetchError = useEventStore((s) => s.fetchError)
   const select = useEventStore((s) => s.setSelectedEvent)
   const flyTo = useMapStore((s) => s.flyTo)
+  const { dict, timezone, dateLocale } = useLocale()
   const groups = groupByHour(events)
+  const fmtOpts = { dict, timezone, dateLocale }
 
   if (fetchError && !events.length) {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-[var(--accent-red)]">
-        Failed to load events: {fetchError}
+        {dict.timeline.error}: {fetchError}
       </div>
     )
   }
@@ -45,7 +48,7 @@ export function TimelineView() {
   if (!Object.keys(groups).length) {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-[var(--text-secondary)]">
-        No events to display
+        {dict.timeline.empty}
       </div>
     )
   }
@@ -55,7 +58,7 @@ export function TimelineView() {
       {Object.entries(groups).map(([hour, events]) => (
         <div key={hour} className="mb-4">
           <div className="text-[10px] font-semibold text-[var(--text-secondary)] mb-1 uppercase tracking-wider">
-            {new Date(hour + ':00:00Z').toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
+            {formatDateTime(hour + ':00:00Z', fmtOpts)}
           </div>
           <div className="border-l-2 border-[var(--border)] ml-2 pl-4 flex flex-col gap-1.5">
             {events.map((e) => {
@@ -70,7 +73,7 @@ export function TimelineView() {
                   className="flex items-center gap-2 text-left group hover:bg-[var(--bg-tertiary)] rounded px-2 py-1 -ml-2 transition-colors"
                 >
                   <span className="text-[10px] text-[var(--text-secondary)] w-10 shrink-0">
-                    {formatHour(e.timestamp)}
+                    {formatHour(e.timestamp, fmtOpts)}
                   </span>
                   <Icon size={12} className="text-[var(--text-secondary)] shrink-0" />
                   <span className="text-xs text-[var(--text-primary)] truncate group-hover:text-[var(--accent-blue)]">

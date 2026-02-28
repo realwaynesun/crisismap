@@ -1,12 +1,14 @@
 'use client'
 
 import { useEventStore } from '@/stores/event-store'
+import { useLocale } from '@/lib/locale-context'
 import { EventCard } from './event-card'
 
 export function EventFeed() {
   const events = useEventStore((s) => s.events)
   const filters = useEventStore((s) => s.filters)
   const fetchError = useEventStore((s) => s.fetchError)
+  const { dict } = useLocale()
 
   const filtered = events.filter((e) => {
     if (filters.categories.length && !filters.categories.includes(e.category))
@@ -28,7 +30,7 @@ export function EventFeed() {
   if (fetchError && !events.length) {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-[var(--accent-red)]">
-        Failed to load events: {fetchError}
+        {dict.feed.error}: {fetchError}
       </div>
     )
   }
@@ -36,7 +38,7 @@ export function EventFeed() {
   if (!filtered.length) {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-[var(--text-secondary)]">
-        No events match current filters
+        {dict.feed.empty}
       </div>
     )
   }
