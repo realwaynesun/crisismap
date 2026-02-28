@@ -45,21 +45,44 @@ async function fetchQuote(symbol: string, name: string): Promise<MarketIndicator
   }
 }
 
-async function fetchBinanceBTC(): Promise<MarketIndicator | null> {
+async function fetchBTC(): Promise<MarketIndicator | null> {
+  // Try Binance first, fallback to CoinGecko (Binance blocked from US IPs)
   try {
     const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT', {
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(3000),
     })
+    if (res.ok) {
+      const data = await res.json()
+      return {
+        symbol: 'BTCUSDT',
+        name: 'BTC',
+        price: Math.round(parseFloat(data.lastPrice) * 100) / 100,
+        change: Math.round(parseFloat(data.priceChange) * 100) / 100,
+        changePercent: Math.round(parseFloat(data.priceChangePercent) * 100) / 100,
+        timestamp: new Date(data.closeTime).toISOString(),
+      }
+    }
+  } catch { /* fall through */ }
+
+  // Fallback: CoinGecko (works from US)
+  try {
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true',
+      { signal: AbortSignal.timeout(5000) },
+    )
     if (!res.ok) return null
     const data = await res.json()
+    const price = data.bitcoin?.usd
+    const changePct = data.bitcoin?.usd_24h_change
+    if (!price) return null
 
     return {
       symbol: 'BTCUSDT',
       name: 'BTC',
-      price: Math.round(parseFloat(data.lastPrice) * 100) / 100,
-      change: Math.round(parseFloat(data.priceChange) * 100) / 100,
-      changePercent: Math.round(parseFloat(data.priceChangePercent) * 100) / 100,
-      timestamp: new Date(data.closeTime).toISOString(),
+      price: Math.round(price * 100) / 100,
+      change: Math.round((price * changePct / 100) * 100) / 100,
+      changePercent: Math.round(changePct * 100) / 100,
+      timestamp: new Date().toISOString(),
     }
   } catch {
     return null
@@ -77,7 +100,7 @@ export async function GET() {
 
     const results = await Promise.allSettled([
       ...YAHOO_SYMBOLS.map(s => fetchQuote(s.symbol, s.name)),
-      fetchBinanceBTC(),
+      fetchBTC(),
     ])
 
     const indicators = results
