@@ -13,12 +13,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <head>
-        <link
-          href="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css"
-          rel="stylesheet"
-        />
-      </head>
       <body className="antialiased">{children}</body>
     </html>
   )

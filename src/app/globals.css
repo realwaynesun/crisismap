@@ -20,8 +20,8 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* Mapbox overrides */
-.mapboxgl-popup-content {
+/* MapLibre popup overrides */
+.maplibregl-popup-content {
   background: var(--bg-secondary) !important;
   color: var(--text-primary) !important;
   border: 1px solid var(--border) !important;
@@ -29,8 +29,13 @@ body {
   padding: 12px !important;
 }
 
-.mapboxgl-popup-tip {
+.maplibregl-popup-tip {
   border-top-color: var(--bg-secondary) !important;
+}
+
+.maplibregl-popup-close-button {
+  color: var(--text-secondary) !important;
+  font-size: 18px !important;
 }
 
 /* Scrollbar */
