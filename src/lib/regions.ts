@@ -11,7 +11,7 @@ const REGION_KEYWORDS: Record<Exclude<Region, 'all'>, string[]> = {
     'hormuz', 'persian gulf', 'red sea', 'hezbollah', 'houthi', 'irgc',
     'netanyahu', 'khamenei', 'idf', 'middle east', 'mideast', 'suez',
     'golan', 'rafah', 'erbil', 'basra', 'sanaa', 'aden', 'ankara',
-    'istanbul', 'cairo', 'fordow', 'arak', 'nuclear', 'airspace alert',
+    'istanbul', 'cairo', 'fordow', 'arak', 'nuclear',
   ],
   'europe': [
     'ukraine', 'russia', 'kyiv', 'moscow', 'kharkiv', 'crimea', 'donbas',

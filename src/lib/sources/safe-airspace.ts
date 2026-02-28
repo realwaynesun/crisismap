@@ -48,7 +48,7 @@ async function scrapeEntries(): Promise<AirspaceEntry[]> {
   while ((match = itemRegex.exec(html)) !== null) {
     const level = parseLevel(match[1])
     const country = match[2]
-    if (level === 0) continue
+    if (level === 0 || level > 2) continue
     // Keep highest risk level per country
     const existing = seen.get(country)
     if (!existing || level < existing.level) {
