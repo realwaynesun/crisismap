@@ -7,10 +7,22 @@ export const dynamic = 'force-dynamic'
 const CACHE_KEY = 'polymarket'
 const CACHE_TTL = 300_000
 
-const GEO_KEYWORDS = [
-  'iran', 'israel', 'war', 'nuclear', 'china', 'taiwan',
-  'russia', 'ukraine', 'nato', 'oil', 'military', 'strike',
-  'sanction', 'conflict', 'invasion',
+// Each entry: ALL terms must appear in the question
+const CRISIS_FILTERS = [
+  ['iran'],
+  ['israel', 'attack'],
+  ['israel', 'iran'],
+  ['nuclear', 'strike'],
+  ['nuclear', 'war'],
+  ['military', 'strike'],
+  ['oil', 'price'],
+  ['oil', 'embargo'],
+  ['sanction', 'iran'],
+  ['strait', 'hormuz'],
+  ['world war'],
+  ['nato', 'war'],
+  ['hezbollah'],
+  ['houthi'],
 ]
 
 export async function GET() {
@@ -30,7 +42,7 @@ export async function GET() {
     const contracts: PolymarketContract[] = (Array.isArray(markets) ? markets : [])
       .filter((m: Record<string, unknown>) => {
         const q = String(m.question ?? '').toLowerCase()
-        return GEO_KEYWORDS.some(kw => q.includes(kw))
+        return CRISIS_FILTERS.some(terms => terms.every(t => q.includes(t)))
       })
       .slice(0, 20)
       .map((m: Record<string, unknown>) => {

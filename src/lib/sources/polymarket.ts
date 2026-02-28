@@ -3,9 +3,21 @@ import type { PolymarketContract } from '@/types'
 
 const ENDPOINT = 'https://gamma-api.polymarket.com/markets'
 
-const GEO_KEYWORDS = [
-  'iran', 'israel', 'war', 'nuclear', 'china', 'taiwan',
-  'russia', 'ukraine', 'nato', 'oil',
+const CRISIS_FILTERS = [
+  ['iran'],
+  ['israel', 'attack'],
+  ['israel', 'iran'],
+  ['nuclear', 'strike'],
+  ['nuclear', 'war'],
+  ['military', 'strike'],
+  ['oil', 'price'],
+  ['oil', 'embargo'],
+  ['sanction', 'iran'],
+  ['strait', 'hormuz'],
+  ['world war'],
+  ['nato', 'war'],
+  ['hezbollah'],
+  ['houthi'],
 ]
 
 function hash(str: string): string {
@@ -34,7 +46,7 @@ function probabilityToLevel(prob: number): ThreatLevel {
 
 function isGeopolitical(question: string): boolean {
   const lower = question.toLowerCase()
-  return GEO_KEYWORDS.some((kw) => lower.includes(kw))
+  return CRISIS_FILTERS.some(terms => terms.every(t => lower.includes(t)))
 }
 
 function parseOutcomePrice(raw: string): number {
