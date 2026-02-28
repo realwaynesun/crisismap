@@ -67,7 +67,7 @@ export function CrisisMap() {
       onMove={onMove}
       mapStyle={STYLE}
       style={{ width: '100%', height: '100%' }}
-      scrollZoom={{ speed: 3, smooth: true }}
+      onLoad={(evt) => evt.target.scrollZoom.setWheelZoomRate(1 / 100)}
       attributionControl={false}
     >
       {geoEvents.map((e) => (
