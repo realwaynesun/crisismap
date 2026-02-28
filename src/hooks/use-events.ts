@@ -1,6 +1,7 @@
 import useSWR from 'swr'
 import { useEffect } from 'react'
 import { useEventStore } from '@/stores/event-store'
+import { useLocale } from '@/lib/locale-context'
 import type { CrisisEvent } from '@/types'
 
 const fetcher = async (url: string) => {
@@ -14,9 +15,12 @@ const fetcher = async (url: string) => {
 export function useEvents() {
   const setEvents = useEventStore((s) => s.setEvents)
   const setFetchError = useEventStore((s) => s.setFetchError)
+  const { locale } = useLocale()
+
+  const url = locale === 'zh-TW' ? '/api/events?locale=zh-TW' : '/api/events'
 
   const { data, error, isLoading } = useSWR<CrisisEvent[]>(
-    '/api/events',
+    url,
     fetcher,
     { refreshInterval: 30_000 },
   )

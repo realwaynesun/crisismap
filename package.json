@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "fast-xml-parser": "^4.5.0",
     "lucide-react": "^0.460.0",
     "maplibre-gl": "^4.7.1",
