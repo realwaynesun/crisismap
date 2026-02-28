@@ -6,6 +6,7 @@ import { acledSource } from './acled'
 import { polymarket } from './polymarket'
 import { yahooFinance } from './yahoo-finance'
 import { xGrokSource } from './x-grok'
+import { digestSource } from './digest'
 
 const publicSources: DataSource[] = [
   usgs,
@@ -18,6 +19,7 @@ const publicSources: DataSource[] = [
 
 const privateSources: DataSource[] = [
   xGrokSource,
+  digestSource,
 ]
 
 export function getSources(): DataSource[] {
