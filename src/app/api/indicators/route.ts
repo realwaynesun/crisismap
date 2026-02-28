@@ -49,7 +49,11 @@ async function fetchQuote(symbol: string, name: string): Promise<MarketIndicator
 export async function GET() {
   try {
     const cached = getCached<MarketIndicator[]>(CACHE_KEY)
-    if (cached) return NextResponse.json({ success: true, data: cached })
+    if (cached) {
+      return NextResponse.json({ success: true, data: cached }, {
+        headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
+      })
+    }
 
     const results = await Promise.allSettled(
       SYMBOLS.map(s => fetchQuote(s.symbol, s.name))
@@ -60,7 +64,9 @@ export async function GET() {
       .filter((v): v is MarketIndicator => v !== null)
 
     setCache(CACHE_KEY, indicators, CACHE_TTL)
-    return NextResponse.json({ success: true, data: indicators })
+    return NextResponse.json({ success: true, data: indicators }, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
+    })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json({ success: false, error: message }, { status: 500 })
