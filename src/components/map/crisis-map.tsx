@@ -1,14 +1,15 @@
 'use client'
 
 import { useCallback, useEffect, useRef } from 'react'
-import Map, { Marker, Popup } from 'react-map-gl'
-import type { MapRef } from 'react-map-gl'
+import Map, { Marker, Popup } from 'react-map-gl/maplibre'
+import type { MapRef } from 'react-map-gl/maplibre'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEventStore } from '@/stores/event-store'
 import { useMapStore } from '@/stores/map-store'
 import { MarkerDot } from './marker-dot'
 import { MarkerPopup } from './marker-popup'
 
-const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 
 export function CrisisMap() {
   const mapRef = useRef<MapRef>(null)
@@ -39,23 +40,14 @@ export function CrisisMap() {
     [setViewport],
   )
 
-  if (!TOKEN) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-[var(--bg-primary)] text-[var(--text-secondary)] text-sm">
-        Set NEXT_PUBLIC_MAPBOX_TOKEN to enable map
-      </div>
-    )
-  }
-
   const geoEvents = events.filter((e) => e.location)
 
   return (
     <Map
       ref={mapRef}
-      mapboxAccessToken={TOKEN}
       initialViewState={viewport}
       onMove={onMove}
-      mapStyle="mapbox://styles/mapbox/dark-v11"
+      mapStyle={STYLE}
       style={{ width: '100%', height: '100%' }}
       attributionControl={false}
     >

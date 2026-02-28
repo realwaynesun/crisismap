@@ -11,7 +11,7 @@
   "dependencies": {
     "fast-xml-parser": "^4.5.0",
     "lucide-react": "^0.460.0",
-    "mapbox-gl": "^3.8.0",
+    "maplibre-gl": "^4.7.1",
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -23,7 +23,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/mapbox__point-geometry": "^1.0.87",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
