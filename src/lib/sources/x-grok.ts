@@ -10,75 +10,80 @@ function hash(str: string): string {
   return Math.abs(h).toString(36)
 }
 
-const CRISIS_QUERY = 'Iran strike OR nuclear OR military attack OR conflict OR missile from:DeItaone OR from:BNONews OR from:disclosetv'
+const ACCOUNTS = ['DeItaone', 'BNONews', 'disclosetv']
+const KEYWORDS = 'Iran OR strike OR nuclear OR military OR missile OR conflict'
 
-export const xGrokSource: DataSource = {
-  id: 'x-grok',
-  name: 'X/Grok',
-  tier: 'private',
+interface Tweet {
+  text: string
+  author: string
+  time: string
+  url: string
+}
 
-  async fetch(options?: FetchOptions): Promise<CrisisEvent[]> {
-    const apiKey = process.env.XAI_API_KEY
-    if (!apiKey) return []
+async function fetchViaXApi(): Promise<Tweet[]> {
+  const token = process.env.X_BEARER_TOKEN
+  if (!token) return []
 
-    const query = options?.query ?? CRISIS_QUERY
+  const query = ACCOUNTS.map(a => `from:${a}`).join(' OR ') + ` (${KEYWORDS})`
+  const params = new URLSearchParams({
+    query,
+    max_results: '10',
+    'tweet.fields': 'created_at,author_id',
+    'expansions': 'author_id',
+  })
 
-    const res = await fetch('https://api.x.ai/v1/responses', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'grok-4-1-fast-reasoning',
-        tools: [{ type: 'x_search' }],
-        input: [{
-          role: 'user',
-          content: `Search X/Twitter for: ${query}\n\nReturn ONLY a JSON array of the 10 most recent results. Each object must have: {"text": "full tweet", "author": "@handle", "time": "ISO 8601", "url": "tweet url"}\n\nNo explanation, just the JSON array.`,
-        }],
-      }),
-      signal: AbortSignal.timeout(10000),
-    })
+  const res = await fetch(`https://api.x.com/2/tweets/search/recent?${params}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(5000),
+  })
+  if (!res.ok) return []
 
-    if (!res.ok) {
-      console.error(`[x-grok] API error: ${res.status}`)
-      return []
-    }
+  const json = await res.json()
+  const users = new Map<string, string>()
+  for (const u of json.includes?.users ?? []) {
+    users.set(u.id, u.username)
+  }
 
-    const json = await res.json()
-    const content = extractContent(json)
+  return (json.data ?? []).map((t: { id: string; text: string; created_at: string; author_id: string }) => ({
+    text: t.text,
+    author: `@${users.get(t.author_id) ?? 'unknown'}`,
+    time: t.created_at,
+    url: `https://x.com/i/status/${t.id}`,
+  }))
+}
 
-    let tweets: Array<{ text: string; author: string; time: string; url: string }>
-    try {
-      const match = content.match(/\[[\s\S]*\]/)
-      tweets = match ? JSON.parse(match[0]) : []
-    } catch {
-      return []
-    }
+async function fetchViaGrok(query: string): Promise<Tweet[]> {
+  const apiKey = process.env.XAI_API_KEY
+  if (!apiKey) return []
 
-    return tweets.slice(0, options?.limit ?? 10).map(t => {
-      const category = detectCategory(t.text)
-      const level = scoreThreatLevel(t.text, '', category)
-      const location = geocode(t.text)
-      return {
-        id: `x-grok:${hash(t.url || t.text)}`,
-        title: t.text.slice(0, 120),
-        summary: t.text,
-        category,
-        level,
-        location,
-        timestamp: t.time || new Date().toISOString(),
-        source: `x:${t.author}`,
-        sourceTier: 'private' as const,
-        url: t.url,
-        actor: extractActor(t.text),
-      }
-    })
-  },
+  const res = await fetch('https://api.x.ai/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'grok-4-1-fast-reasoning',
+      tools: [{ type: 'x_search' }],
+      input: [{
+        role: 'user',
+        content: `Search X/Twitter for: ${query}\n\nReturn ONLY a JSON array of the 10 most recent results. Each object must have: {"text": "full tweet", "author": "@handle", "time": "ISO 8601", "url": "tweet url"}\n\nNo explanation, just the JSON array.`,
+      }],
+    }),
+    signal: AbortSignal.timeout(20000),
+  })
 
-  async healthCheck(): Promise<boolean> {
-    return !!process.env.XAI_API_KEY
-  },
+  if (!res.ok) return []
+
+  const json = await res.json()
+  const content = extractContent(json)
+
+  try {
+    const match = content.match(/\[[\s\S]*\]/)
+    return match ? JSON.parse(match[0]) : []
+  } catch {
+    return []
+  }
 }
 
 function extractContent(json: Record<string, unknown>): string {
@@ -107,4 +112,50 @@ function detectCategory(text: string): CrisisEvent['category'] {
 function extractActor(text: string): string | undefined {
   const actors = ['Biden', 'Trump', 'Netanyahu', 'Khamenei', 'IRGC', 'IDF', 'Pentagon', 'NATO', 'Hezbollah', 'Hamas']
   return actors.find(a => text.includes(a))
+}
+
+function tweetsToEvents(tweets: Tweet[], limit: number): CrisisEvent[] {
+  return tweets.slice(0, limit).map(t => {
+    const category = detectCategory(t.text)
+    const level = scoreThreatLevel(t.text, '', category)
+    const location = geocode(t.text)
+    return {
+      id: `x-grok:${hash(t.url || t.text)}`,
+      title: t.text.slice(0, 120),
+      summary: t.text,
+      category,
+      level,
+      location,
+      timestamp: t.time || new Date().toISOString(),
+      source: `x:${t.author}`,
+      sourceTier: 'private' as const,
+      url: t.url,
+      actor: extractActor(t.text),
+    }
+  })
+}
+
+const CRISIS_QUERY = 'Iran strike OR nuclear OR military attack OR conflict OR missile from:DeItaone OR from:BNONews OR from:disclosetv'
+
+export const xGrokSource: DataSource = {
+  id: 'x-grok',
+  name: 'X/Grok',
+  tier: 'private',
+
+  async fetch(options?: FetchOptions): Promise<CrisisEvent[]> {
+    const limit = options?.limit ?? 10
+
+    // Try X API v2 first (fast, ~1-2s)
+    const xTweets = await fetchViaXApi()
+    if (xTweets.length > 0) return tweetsToEvents(xTweets, limit)
+
+    // Fallback to Grok x_search (slower, ~15s)
+    const query = options?.query ?? CRISIS_QUERY
+    const grokTweets = await fetchViaGrok(query)
+    return tweetsToEvents(grokTweets, limit)
+  },
+
+  async healthCheck(): Promise<boolean> {
+    return !!process.env.X_BEARER_TOKEN || !!process.env.XAI_API_KEY
+  },
 }
