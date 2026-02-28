@@ -16,6 +16,10 @@ const en = {
   header: { title: '\u2295 CrisisMap', live: '\u26A1 Live' },
   tabs: { feed: 'Feed', timeline: 'Timeline', intel: 'Intel' },
   filters: { search: 'Search events...' },
+  regions: {
+    all: 'All', 'middle-east': 'Middle East', europe: 'Europe',
+    'east-asia': 'East Asia', africa: 'Africa', americas: 'Americas',
+  } as Record<string, string>,
   categories: {
     conflict: 'conflict', military: 'military', diplomatic: 'diplomatic',
     economic: 'economic', terrorism: 'terrorism', disaster: 'disaster',
@@ -46,6 +50,10 @@ const zhTW: typeof en = {
   header: { title: '\u2295 CrisisMap', live: '\u26A1 \u5373\u6642' },
   tabs: { feed: '\u52D5\u614B', timeline: '\u6642\u9593\u7DDA', intel: '\u60C5\u5831' },
   filters: { search: '\u641C\u5C0B\u4E8B\u4EF6...' },
+  regions: {
+    all: '\u5168\u90E8', 'middle-east': '\u4E2D\u6771', europe: '\u6B50\u6D32',
+    'east-asia': '\u6771\u4E9E', africa: '\u975E\u6D32', americas: '\u7F8E\u6D32',
+  },
   categories: {
     conflict: '\u885D\u7A81', military: '\u8ECD\u4E8B', diplomatic: '\u5916\u4EA4',
     economic: '\u7D93\u6FDF', terrorism: '\u6050\u600E\u653B\u64CA', disaster: '\u707D\u5BB3',

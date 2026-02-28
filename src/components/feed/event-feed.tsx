@@ -2,15 +2,19 @@
 
 import { useEventStore } from '@/stores/event-store'
 import { useLocale } from '@/lib/locale-context'
+import { matchesRegion } from '@/lib/regions'
 import { EventCard } from './event-card'
 
 export function EventFeed() {
   const events = useEventStore((s) => s.events)
   const filters = useEventStore((s) => s.filters)
+  const region = useEventStore((s) => s.region)
   const fetchError = useEventStore((s) => s.fetchError)
   const { dict } = useLocale()
 
   const filtered = events.filter((e) => {
+    const text = `${e.title} ${e.summary} ${e.location?.name ?? ''}`
+    if (!matchesRegion(region, text, e.location?.country)) return false
     if (filters.categories.length && !filters.categories.includes(e.category))
       return false
     if (filters.levels.length && !filters.levels.includes(e.level))
@@ -19,8 +23,7 @@ export function EventFeed() {
       return false
     if (filters.search) {
       const q = filters.search.toLowerCase()
-      const text = `${e.title} ${e.summary} ${e.location?.name ?? ''}`.toLowerCase()
-      if (!text.includes(q)) return false
+      if (!text.toLowerCase().includes(q)) return false
     }
     return true
   }).sort(

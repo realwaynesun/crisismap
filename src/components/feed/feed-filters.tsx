@@ -3,6 +3,8 @@
 import { useEventStore } from '@/stores/event-store'
 import { useLocale } from '@/lib/locale-context'
 import { Search } from 'lucide-react'
+import { regions } from '@/lib/regions'
+import type { Region } from '@/lib/regions'
 import type { EventCategory, ThreatLevel } from '@/types'
 
 const categories: EventCategory[] = [
@@ -23,6 +25,8 @@ const levelColors: Record<ThreatLevel, string> = {
 export function FeedFilters() {
   const filters = useEventStore((s) => s.filters)
   const setFilters = useEventStore((s) => s.setFilters)
+  const region = useEventStore((s) => s.region)
+  const setRegion = useEventStore((s) => s.setRegion)
   const { dict } = useLocale()
 
   const toggleCategory = (c: EventCategory) => {
@@ -41,6 +45,22 @@ export function FeedFilters() {
 
   return (
     <div className="flex flex-col gap-2 pb-2 border-b border-[var(--border)]">
+      <div className="flex gap-1 overflow-x-auto no-scrollbar">
+        {regions.map((r: Region) => (
+          <button
+            key={r}
+            onClick={() => setRegion(r)}
+            className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-colors ${
+              region === r
+                ? 'bg-[var(--accent-blue)] border-[var(--accent-blue)] text-white'
+                : 'border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--text-secondary)]'
+            }`}
+          >
+            {dict.regions[r] ?? r}
+          </button>
+        ))}
+      </div>
+
       <div className="relative">
         <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
         <input

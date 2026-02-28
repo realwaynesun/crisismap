@@ -7,6 +7,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEventStore } from '@/stores/event-store'
 import { useMapStore } from '@/stores/map-store'
 import { useLocale } from '@/lib/locale-context'
+import { matchesRegion } from '@/lib/regions'
 import { MarkerDot } from './marker-dot'
 import { MarkerPopup } from './marker-popup'
 
@@ -24,6 +25,7 @@ const legendColors: Record<string, string> = {
 export function CrisisMap() {
   const mapRef = useRef<MapRef>(null)
   const events = useEventStore((s) => s.events)
+  const region = useEventStore((s) => s.region)
   const selectedId = useEventStore((s) => s.selectedEventId)
   const select = useEventStore((s) => s.setSelectedEvent)
   const viewport = useMapStore((s) => s.viewport)
@@ -51,7 +53,11 @@ export function CrisisMap() {
     [setViewport],
   )
 
-  const geoEvents = events.filter((e) => e.location)
+  const geoEvents = events.filter((e) => {
+    if (!e.location) return false
+    const text = `${e.title} ${e.summary} ${e.location.name}`
+    return matchesRegion(region, text, e.location.country)
+  })
 
   return (
     <div className="relative w-full h-full">

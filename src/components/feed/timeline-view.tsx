@@ -3,6 +3,7 @@
 import { useEventStore } from '@/stores/event-store'
 import { useMapStore } from '@/stores/map-store'
 import { useLocale } from '@/lib/locale-context'
+import { matchesRegion } from '@/lib/regions'
 import { formatHour, formatDateTime } from '@/lib/format'
 import type { EventCategory } from '@/types'
 import {
@@ -29,11 +30,16 @@ function groupByHour(events: ReturnType<typeof useEventStore.getState>['events']
 }
 
 export function TimelineView() {
-  const events = useEventStore((s) => s.events)
+  const allEvents = useEventStore((s) => s.events)
+  const region = useEventStore((s) => s.region)
   const fetchError = useEventStore((s) => s.fetchError)
   const select = useEventStore((s) => s.setSelectedEvent)
   const flyTo = useMapStore((s) => s.flyTo)
   const { dict, timezone, dateLocale } = useLocale()
+  const events = allEvents.filter((e) => {
+    const text = `${e.title} ${e.summary} ${e.location?.name ?? ''}`
+    return matchesRegion(region, text, e.location?.country)
+  })
   const groups = groupByHour(events)
   const fmtOpts = { dict, timezone, dateLocale }
 
