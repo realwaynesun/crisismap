@@ -5,6 +5,8 @@ import { rssSource } from './rss'
 import { acledSource } from './acled'
 import { polymarket } from './polymarket'
 import { yahooFinance } from './yahoo-finance'
+import { firmsSource } from './firms'
+import { safeAirspaceSource } from './safe-airspace'
 import { xGrokSource } from './x-grok'
 import { digestSource } from './digest'
 
@@ -15,6 +17,8 @@ const publicSources: DataSource[] = [
   acledSource,
   polymarket,
   yahooFinance,
+  firmsSource,
+  safeAirspaceSource,
 ]
 
 const privateSources: DataSource[] = [
