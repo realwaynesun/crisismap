@@ -4,6 +4,7 @@ import { getCached, setCache } from './cache'
 
 const CACHE_TTL = 30_000
 const MAX_EVENTS = 200
+const SOURCE_TIMEOUT = 10_000
 
 function cacheKey(options?: FetchOptions): string {
   const q = options?.query ?? ''
@@ -21,7 +22,12 @@ export async function fetchAllEvents(options?: FetchOptions): Promise<CrisisEven
   const sources = getSources()
   const results = await Promise.allSettled(
     sources.map(s =>
-      s.fetch(options).catch(err => {
+      Promise.race([
+        s.fetch(options),
+        new Promise<CrisisEvent[]>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), SOURCE_TIMEOUT),
+        ),
+      ]).catch(err => {
         console.error(`[${s.id}] fetch failed:`, err.message)
         return [] as CrisisEvent[]
       })

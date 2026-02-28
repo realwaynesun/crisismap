@@ -37,7 +37,7 @@ export const xGrokSource: DataSource = {
           content: `Search X/Twitter for: ${query}\n\nReturn ONLY a JSON array of the 10 most recent results. Each object must have: {"text": "full tweet", "author": "@handle", "time": "ISO 8601", "url": "tweet url"}\n\nNo explanation, just the JSON array.`,
         }],
       }),
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(10000),
     })
 
     if (!res.ok) {
