@@ -9,7 +9,7 @@ export async function fetchAllEvents(options?: FetchOptions): Promise<CrisisEven
   const cached = getCached<CrisisEvent[]>(CACHE_KEY)
   if (cached) return cached
 
-  const sources = await getSources()
+  const sources = getSources()
   const results = await Promise.allSettled(
     sources.map(s =>
       s.fetch(options).catch(err => {
