@@ -43,6 +43,7 @@ export function CrisisMap() {
   const geoEvents = events.filter((e) => e.location)
 
   return (
+    <div className="relative w-full h-full">
     <Map
       ref={mapRef}
       initialViewState={viewport}
@@ -75,5 +76,20 @@ export function CrisisMap() {
         </Popup>
       )}
     </Map>
+    <div className="absolute bottom-3 right-3 bg-[var(--bg-secondary)]/90 border border-[var(--border)] rounded-lg px-3 py-2 text-[10px] flex flex-col gap-1">
+      {([
+        ['var(--accent-red)', 'Critical'],
+        ['var(--accent-orange)', 'High'],
+        ['var(--accent-yellow)', 'Medium'],
+        ['var(--accent-blue)', 'Low'],
+        ['var(--accent-green)', 'Info'],
+      ] as const).map(([color, label]) => (
+        <div key={label} className="flex items-center gap-1.5">
+          <span className="inline-block w-2.5 h-2.5 rounded-full border border-black/30" style={{ background: color }} />
+          <span className="text-[var(--text-secondary)]">{label}</span>
+        </div>
+      ))}
+    </div>
+    </div>
   )
 }
