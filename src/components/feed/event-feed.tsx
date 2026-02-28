@@ -6,6 +6,7 @@ import { EventCard } from './event-card'
 export function EventFeed() {
   const events = useEventStore((s) => s.events)
   const filters = useEventStore((s) => s.filters)
+  const fetchError = useEventStore((s) => s.fetchError)
 
   const filtered = events.filter((e) => {
     if (filters.categories.length && !filters.categories.includes(e.category))
@@ -23,6 +24,14 @@ export function EventFeed() {
   }).sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   )
+
+  if (fetchError && !events.length) {
+    return (
+      <div className="flex items-center justify-center h-40 text-sm text-[var(--accent-red)]">
+        Failed to load events: {fetchError}
+      </div>
+    )
+  }
 
   if (!filtered.length) {
     return (

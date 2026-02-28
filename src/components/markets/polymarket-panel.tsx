@@ -3,12 +3,20 @@
 import { useMarkets } from '@/hooks/use-markets'
 
 export function PolymarketPanel() {
-  const { contracts, isLoading } = useMarkets()
+  const { contracts, error, isLoading } = useMarkets()
 
   if (isLoading) {
     return (
       <div className="h-16 flex items-center justify-center text-xs text-[var(--text-secondary)] bg-[var(--bg-secondary)] border-t border-[var(--border)]">
         Loading prediction markets...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="h-16 flex items-center justify-center text-xs text-[var(--accent-red)] bg-[var(--bg-secondary)] border-t border-[var(--border)]">
+        Prediction markets unavailable
       </div>
     )
   }

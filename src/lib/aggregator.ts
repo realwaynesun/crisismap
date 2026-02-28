@@ -6,8 +6,11 @@ const CACHE_TTL = 30_000
 const MAX_EVENTS = 200
 
 function cacheKey(options?: FetchOptions): string {
-  if (!options?.query && !options?.since) return 'aggregator:events'
-  return `aggregator:${options.query ?? ''}:${options.since ?? ''}`
+  const q = options?.query ?? ''
+  const s = options?.since ?? ''
+  const l = options?.limit ?? MAX_EVENTS
+  if (!q && !s && l === MAX_EVENTS) return 'aggregator:events'
+  return `aggregator:${q}:${s}:${l}`
 }
 
 export async function fetchAllEvents(options?: FetchOptions): Promise<CrisisEvent[]> {

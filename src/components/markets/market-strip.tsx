@@ -4,12 +4,20 @@ import { useIndicators } from '@/hooks/use-indicators'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 
 export function MarketStrip() {
-  const { indicators, isLoading } = useIndicators()
+  const { indicators, error, isLoading } = useIndicators()
 
   if (isLoading) {
     return (
       <div className="flex items-center gap-4 text-xs text-[var(--text-secondary)]">
         Loading markets...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center gap-4 text-xs text-[var(--accent-red)]">
+        Market data unavailable
       </div>
     )
   }

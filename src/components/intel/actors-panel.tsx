@@ -13,7 +13,7 @@ const fetcher = async (url: string) => {
 }
 
 export function ActorsPanel() {
-  const { data, isLoading } = useSWR<ActorStatus[]>('/api/actors', fetcher, {
+  const { data, error, isLoading } = useSWR<ActorStatus[]>('/api/actors', fetcher, {
     refreshInterval: 300_000,
   })
 
@@ -21,6 +21,14 @@ export function ActorsPanel() {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-[var(--text-secondary)]">
         Loading actors...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-40 text-sm text-[var(--accent-red)]">
+        Failed to load actors: {String(error.message ?? error)}
       </div>
     )
   }

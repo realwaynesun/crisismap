@@ -13,6 +13,7 @@ const fetcher = async (url: string) => {
 
 export function useEvents() {
   const setEvents = useEventStore((s) => s.setEvents)
+  const setFetchError = useEventStore((s) => s.setFetchError)
 
   const { data, error, isLoading } = useSWR<CrisisEvent[]>(
     '/api/events',
@@ -23,6 +24,10 @@ export function useEvents() {
   useEffect(() => {
     if (data) setEvents(data)
   }, [data, setEvents])
+
+  useEffect(() => {
+    setFetchError(error ? String(error.message ?? error) : null)
+  }, [error, setFetchError])
 
   return { events: data ?? [], error, isLoading }
 }

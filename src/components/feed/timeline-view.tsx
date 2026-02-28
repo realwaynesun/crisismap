@@ -29,9 +29,18 @@ function groupByHour(events: ReturnType<typeof useEventStore.getState>['events']
 
 export function TimelineView() {
   const events = useEventStore((s) => s.events)
+  const fetchError = useEventStore((s) => s.fetchError)
   const select = useEventStore((s) => s.setSelectedEvent)
   const flyTo = useMapStore((s) => s.flyTo)
   const groups = groupByHour(events)
+
+  if (fetchError && !events.length) {
+    return (
+      <div className="flex items-center justify-center h-40 text-sm text-[var(--accent-red)]">
+        Failed to load events: {fetchError}
+      </div>
+    )
+  }
 
   if (!Object.keys(groups).length) {
     return (
