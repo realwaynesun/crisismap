@@ -2,11 +2,17 @@ import type { CrisisEvent, FetchOptions } from '@/types'
 import { getSources } from './sources/registry'
 import { getCached, setCache } from './cache'
 
-const CACHE_KEY = 'aggregator:events'
 const CACHE_TTL = 30_000
+const MAX_EVENTS = 200
+
+function cacheKey(options?: FetchOptions): string {
+  if (!options?.query && !options?.since) return 'aggregator:events'
+  return `aggregator:${options.query ?? ''}:${options.since ?? ''}`
+}
 
 export async function fetchAllEvents(options?: FetchOptions): Promise<CrisisEvent[]> {
-  const cached = getCached<CrisisEvent[]>(CACHE_KEY)
+  const key = cacheKey(options)
+  const cached = getCached<CrisisEvent[]>(key)
   if (cached) return cached
 
   const sources = getSources()
@@ -31,10 +37,11 @@ export async function fetchAllEvents(options?: FetchOptions): Promise<CrisisEven
     }
   }
 
-  const sorted = events.sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-  )
+  const limit = options?.limit ?? MAX_EVENTS
+  const sorted = events
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, limit)
 
-  setCache(CACHE_KEY, sorted, CACHE_TTL)
+  setCache(key, sorted, CACHE_TTL)
   return sorted
 }

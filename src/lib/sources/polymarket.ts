@@ -25,10 +25,10 @@ interface GammaMarket {
 }
 
 function probabilityToLevel(prob: number): ThreatLevel {
-  if (prob >= 0.8) return 'critical'
-  if (prob >= 0.6) return 'high'
-  if (prob >= 0.4) return 'medium'
-  if (prob >= 0.2) return 'low'
+  if (prob >= 80) return 'critical'
+  if (prob >= 60) return 'high'
+  if (prob >= 40) return 'medium'
+  if (prob >= 20) return 'low'
   return 'info'
 }
 
@@ -50,18 +50,17 @@ function marketToContract(market: GammaMarket): PolymarketContract {
   return {
     id: market.id,
     question: market.question,
-    probability: parseOutcomePrice(market.outcomePrices),
+    probability: Math.round(parseOutcomePrice(market.outcomePrices) * 100),
     volume: Number(market.volume) || 0,
     url: `https://polymarket.com/event/${market.slug}`,
   }
 }
 
 function contractToEvent(contract: PolymarketContract): CrisisEvent {
-  const pct = (contract.probability * 100).toFixed(0)
   return {
     id: `polymarket:${contract.id}`,
     title: contract.question,
-    summary: `Prediction market: ${pct}% probability. Volume: $${contract.volume.toLocaleString()}`,
+    summary: `Prediction market: ${contract.probability}% probability. Volume: $${contract.volume.toLocaleString()}`,
     category: 'prediction',
     level: probabilityToLevel(contract.probability),
     timestamp: new Date().toISOString(),

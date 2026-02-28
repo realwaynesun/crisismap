@@ -3,8 +3,13 @@ import { useEffect } from 'react'
 import { useEventStore } from '@/stores/event-store'
 import type { CrisisEvent } from '@/types'
 
-const fetcher = (url: string) =>
-  fetch(url).then((r) => r.json()).then((j) => j.data ?? [])
+const fetcher = async (url: string) => {
+  const r = await fetch(url)
+  if (!r.ok) throw new Error(`API ${r.status}`)
+  const j = await r.json()
+  if (!j.success) throw new Error(j.error ?? 'API error')
+  return j.data ?? []
+}
 
 export function useEvents() {
   const setEvents = useEventStore((s) => s.setEvents)

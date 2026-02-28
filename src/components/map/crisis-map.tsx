@@ -42,7 +42,7 @@ export function CrisisMap() {
   if (!TOKEN) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[var(--bg-primary)] text-[var(--text-secondary)] text-sm">
-        Set MAPBOX_TOKEN to enable map
+        Set NEXT_PUBLIC_MAPBOX_TOKEN to enable map
       </div>
     )
   }

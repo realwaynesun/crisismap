@@ -3,7 +3,7 @@ import { geocode } from '@/lib/geocoder'
 import { scoreThreatLevel } from '@/lib/scorer'
 
 const API_BASE = 'https://api.gdeltproject.org/api/v2/doc/doc'
-const DEFAULT_QUERY = 'crisis OR conflict OR military OR attack'
+const DEFAULT_QUERY = '(crisis OR conflict OR military OR attack)'
 
 interface GdeltArticle {
   url: string
@@ -90,8 +90,12 @@ function mapArticle(article: GdeltArticle): CrisisEvent {
 }
 
 function parseGdeltDate(raw: string): string {
-  const cleaned = raw.replace(/T/, ' ').replace(/Z$/, '')
-  const d = new Date(cleaned)
+  // GDELT format: "20260227T110000Z" → insert dashes/colons
+  const m = raw.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z?$/)
+  if (m) {
+    return `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`
+  }
+  const d = new Date(raw)
   if (isNaN(d.getTime())) return new Date().toISOString()
   return d.toISOString()
 }
@@ -103,9 +107,13 @@ export const gdeltSource: DataSource = {
 
   async fetch(options?: FetchOptions): Promise<CrisisEvent[]> {
     const url = buildUrl(options)
-    const res = await fetch(url)
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) })
     if (!res.ok) {
       throw new Error(`GDELT fetch failed: ${res.status}`)
+    }
+    const contentType = res.headers.get('content-type') ?? ''
+    if (!contentType.includes('json')) {
+      throw new Error(`GDELT returned non-JSON: ${contentType}`)
     }
     const data = (await res.json()) as GdeltResponse
     if (!data.articles?.length) return []

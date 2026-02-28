@@ -1,8 +1,13 @@
 import useSWR from 'swr'
 import type { PolymarketContract } from '@/types'
 
-const fetcher = (url: string) =>
-  fetch(url).then((r) => r.json()).then((j) => j.data ?? [])
+const fetcher = async (url: string) => {
+  const r = await fetch(url)
+  if (!r.ok) throw new Error(`API ${r.status}`)
+  const j = await r.json()
+  if (!j.success) throw new Error(j.error ?? 'API error')
+  return j.data ?? []
+}
 
 export function useMarkets() {
   const { data, error, isLoading } = useSWR<PolymarketContract[]>(

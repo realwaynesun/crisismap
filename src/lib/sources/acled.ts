@@ -64,7 +64,7 @@ function mapCategory(eventType: string): CrisisEvent['category'] {
   const t = (eventType ?? '').toLowerCase()
   if (t.includes('battle')) return 'conflict'
   if (t.includes('explosion') || t.includes('remote violence')) return 'military'
-  if (t.includes('protest') || t.includes('riot')) return 'disaster'
+  if (t.includes('protest') || t.includes('riot')) return 'conflict'
   if (t.includes('violence against civilians')) return 'terrorism'
   if (t.includes('strategic')) return 'diplomatic'
   return 'conflict'
