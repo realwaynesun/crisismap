@@ -1,0 +1,19 @@
+# deps
+node_modules/
+.npm
+
+# next
+.next/
+out/
+
+# env
+.env.local
+.env*.local
+
+# private sources (Master only)
+private/
+
+# misc
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
