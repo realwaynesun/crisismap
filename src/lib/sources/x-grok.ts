@@ -24,7 +24,7 @@ async function fetchViaXApi(): Promise<Tweet[]> {
   const token = process.env.X_BEARER_TOKEN
   if (!token) return []
 
-  const query = ACCOUNTS.map(a => `from:${a}`).join(' OR ') + ` (${KEYWORDS})`
+  const query = `(${ACCOUNTS.map(a => `from:${a}`).join(' OR ')}) (${KEYWORDS})`
   const params = new URLSearchParams({
     query,
     max_results: '10',
@@ -146,8 +146,12 @@ export const xGrokSource: DataSource = {
     const limit = options?.limit ?? 10
 
     // Try X API v2 first (fast, ~1-2s)
-    const xTweets = await fetchViaXApi()
-    if (xTweets.length > 0) return tweetsToEvents(xTweets, limit)
+    try {
+      const xTweets = await fetchViaXApi()
+      if (xTweets.length > 0) return tweetsToEvents(xTweets, limit)
+    } catch (err) {
+      console.warn('[x-grok] X API failed, falling back to Grok:', err)
+    }
 
     // Fallback to Grok x_search (slower, ~15s)
     const query = options?.query ?? CRISIS_QUERY

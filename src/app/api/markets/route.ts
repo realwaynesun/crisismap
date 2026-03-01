@@ -20,6 +20,15 @@ function isCrisisMarket(question: string): boolean {
   return !exclude.some(x => q.includes(x))
 }
 
+function getPolymarketUrl(m: Record<string, unknown>): string | undefined {
+  const events = m.events as Array<Record<string, unknown>> | undefined
+  const eventSlug = events?.[0]?.slug
+  if (typeof eventSlug === 'string' && eventSlug) {
+    return `https://polymarket.com/event/${eventSlug}`
+  }
+  return undefined
+}
+
 function parseMarket(m: Record<string, unknown>): PolymarketContract {
   let prob = 0
   try {
@@ -34,7 +43,7 @@ function parseMarket(m: Record<string, unknown>): PolymarketContract {
     question: String(m.question ?? ''),
     probability: Math.round(prob * 100),
     volume: Number(m.volume ?? m.volumeNum ?? 0),
-    url: m.slug ? `https://polymarket.com/event/${m.slug}` : undefined,
+    url: getPolymarketUrl(m),
   }
 }
 

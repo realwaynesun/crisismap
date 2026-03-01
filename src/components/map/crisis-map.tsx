@@ -6,12 +6,16 @@ import type { MapRef } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEventStore } from '@/stores/event-store'
 import { useMapStore } from '@/stores/map-store'
+import { useThemeStore } from '@/stores/theme-store'
 import { useLocale } from '@/lib/locale-context'
 import { matchesRegion } from '@/lib/regions'
 import { MarkerDot } from './marker-dot'
 import { MarkerPopup } from './marker-popup'
 
-const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+const STYLES = {
+  dark: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+  light: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+} as const
 
 const legendKeys = ['critical', 'high', 'medium', 'low', 'info'] as const
 const legendColors: Record<string, string> = {
@@ -30,6 +34,7 @@ export function CrisisMap() {
   const select = useEventStore((s) => s.setSelectedEvent)
   const viewport = useMapStore((s) => s.viewport)
   const setViewport = useMapStore((s) => s.setViewport)
+  const theme = useThemeStore((s) => s.theme)
   const { dict } = useLocale()
 
   const selectedEvent = events.find((e) => e.id === selectedId)
@@ -65,7 +70,7 @@ export function CrisisMap() {
       ref={mapRef}
       initialViewState={viewport}
       onMove={onMove}
-      mapStyle={STYLE}
+      mapStyle={STYLES[theme]}
       style={{ width: '100%', height: '100%' }}
       onLoad={(evt) => evt.target.scrollZoom.setWheelZoomRate(1 / 100)}
       attributionControl={false}

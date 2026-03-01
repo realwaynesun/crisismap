@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Dark theme (default) */
 :root {
   --bg-primary: #0a0a0f;
   --bg-secondary: #12121a;
@@ -12,6 +13,21 @@
   --accent-yellow: #eab308;
   --accent-blue: #3b82f6;
   --accent-green: #22c55e;
+}
+
+/* Light theme */
+html.light {
+  --bg-primary: #f0f1f5;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e4e5ec;
+  --border: #c8c9d6;
+  --text-primary: #1a1a2e;
+  --text-secondary: #5c5c74;
+  --accent-red: #dc2626;
+  --accent-orange: #ea580c;
+  --accent-yellow: #ca8a04;
+  --accent-blue: #2563eb;
+  --accent-green: #16a34a;
 }
 
 body {

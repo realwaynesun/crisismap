@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const cache = new Map<string, { text: string; ts: number }>()
 const CACHE_TTL = 600_000 // 10 min
+const CACHE_MAX = 2000
 
 function getCached(key: string): string | null {
   const entry = cache.get(key)
@@ -11,6 +12,14 @@ function getCached(key: string): string | null {
     return null
   }
   return entry.text
+}
+
+function setCache(key: string, text: string): void {
+  if (cache.size >= CACHE_MAX) {
+    const oldest = cache.keys().next().value!
+    cache.delete(oldest)
+  }
+  cache.set(key, { text, ts: Date.now() })
 }
 
 export async function translateBatch(
@@ -65,8 +74,8 @@ export async function translateBatch(
         const title = titleMatch[1].trim()
         const summary = summaryMatch[1].trim()
         results[uncached[i].index] = { title, summary }
-        cache.set(`t:${uncached[i].title}`, { text: title, ts: Date.now() })
-        cache.set(`s:${uncached[i].summary}`, { text: summary, ts: Date.now() })
+        setCache(`t:${uncached[i].title}`, title)
+        setCache(`s:${uncached[i].summary}`, summary)
       }
     }
   } catch (err) {
