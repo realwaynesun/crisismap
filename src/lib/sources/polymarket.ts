@@ -26,6 +26,10 @@ function hash(str: string): string {
   return Math.abs(h).toString(36)
 }
 
+interface GammaEvent {
+  slug: string
+}
+
 interface GammaMarket {
   id: string
   question: string
@@ -34,6 +38,7 @@ interface GammaMarket {
   active: boolean
   closed: boolean
   slug: string
+  events: GammaEvent[]
 }
 
 function probabilityToLevel(prob: number): ThreatLevel {
@@ -58,13 +63,19 @@ function parseOutcomePrice(raw: string): number {
   }
 }
 
+function buildMarketUrl(market: GammaMarket): string | undefined {
+  const eventSlug = market.events?.[0]?.slug
+  if (!eventSlug) return undefined
+  return `https://polymarket.com/event/${eventSlug}`
+}
+
 function marketToContract(market: GammaMarket): PolymarketContract {
   return {
     id: market.id,
     question: market.question,
     probability: Math.round(parseOutcomePrice(market.outcomePrices) * 100),
     volume: Number(market.volume) || 0,
-    url: `https://polymarket.com/event/${market.slug}`,
+    url: buildMarketUrl(market),
   }
 }
 
