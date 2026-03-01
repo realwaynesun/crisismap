@@ -2,6 +2,7 @@
 
 import { useLocale } from '@/lib/locale-context'
 import { MarketStrip } from '@/components/markets/market-strip'
+import { TimezoneSelector } from '@/components/timezone-selector'
 import { LocaleSwitcher } from './locale-switcher'
 
 export function Header() {
@@ -24,6 +25,7 @@ export function Header() {
       <div className="flex-1 overflow-hidden">
         <MarketStrip />
       </div>
+      <TimezoneSelector />
       <LocaleSwitcher />
     </header>
   )

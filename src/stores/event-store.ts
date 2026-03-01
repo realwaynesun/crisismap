@@ -9,12 +9,14 @@ interface EventState {
   region: Region
   selectedEventId: string | null
   activeTab: SidebarTab
+  timezone: string
   setEvents: (events: CrisisEvent[]) => void
   setFetchError: (error: string | null) => void
   setFilters: (filters: Partial<FilterState>) => void
   setRegion: (region: Region) => void
   setSelectedEvent: (id: string | null) => void
   setActiveTab: (tab: SidebarTab) => void
+  setTimezone: (tz: string) => void
   filteredEvents: () => CrisisEvent[]
 }
 
@@ -32,6 +34,19 @@ export const useEventStore = create<EventState>((set, get) => ({
   region: 'middle-east' as Region,
   selectedEventId: null,
   activeTab: 'feed',
+  timezone: '',
+
+  setTimezone: (tz) => {
+    try {
+      Intl.DateTimeFormat(undefined, { timeZone: tz })
+    } catch {
+      return
+    }
+    set({ timezone: tz })
+    if (typeof window !== 'undefined') {
+      try { localStorage.setItem('crisismap-timezone', tz) } catch {}
+    }
+  },
 
   setEvents: (events) => set({ events, fetchError: null }),
   setFetchError: (error) => set({ fetchError: error }),
