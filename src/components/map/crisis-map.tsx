@@ -99,7 +99,7 @@ export function CrisisMap() {
         </Popup>
       )}
     </Map>
-    <div className="absolute bottom-3 right-3 bg-[var(--bg-secondary)]/90 border border-[var(--border)] rounded-lg px-3 py-2 text-[10px] flex flex-col gap-1">
+    <div className="absolute bottom-3 right-3 z-10 bg-[var(--bg-secondary)]/90 border border-[var(--border)] rounded-lg px-3 py-2 text-[10px] flex flex-col gap-1">
       {legendKeys.map((key) => (
         <div key={key} className="flex items-center gap-1.5">
           <span className="inline-block w-2.5 h-2.5 rounded-full border border-black/30" style={{ background: legendColors[key] }} />
