@@ -9,7 +9,7 @@ export function PolymarketPanel() {
 
   if (isLoading) {
     return (
-      <div className="h-16 flex items-center justify-center text-xs text-[var(--text-secondary)] bg-[var(--bg-secondary)] border-t border-[var(--border)]">
+      <div className="relative z-20 h-16 flex items-center justify-center text-xs text-[var(--text-secondary)] bg-[var(--bg-secondary)] border-t border-[var(--border)]">
         {dict.polymarket.loading}
       </div>
     )
@@ -17,7 +17,7 @@ export function PolymarketPanel() {
 
   if (error) {
     return (
-      <div className="h-16 flex items-center justify-center text-xs text-[var(--accent-red)] bg-[var(--bg-secondary)] border-t border-[var(--border)]">
+      <div className="relative z-20 h-16 flex items-center justify-center text-xs text-[var(--accent-red)] bg-[var(--bg-secondary)] border-t border-[var(--border)]">
         {dict.polymarket.error}
       </div>
     )
@@ -26,7 +26,7 @@ export function PolymarketPanel() {
   if (!contracts.length) return null
 
   return (
-    <div className="flex items-stretch gap-3 overflow-x-auto px-4 py-2 bg-[var(--bg-secondary)] border-t border-[var(--border)] no-scrollbar">
+    <div className="relative z-20 flex items-stretch gap-3 overflow-x-auto px-4 py-2 bg-[var(--bg-secondary)] border-t border-[var(--border)] no-scrollbar">
       {contracts.map((c) => {
         const pct = Math.round(c.probability)
         const barColor = pct > 70

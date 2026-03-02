@@ -11,10 +11,10 @@ export function Dashboard() {
       <Header />
 
       <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
-        <div className="w-full md:w-[35%] h-[50vh] md:h-auto overflow-hidden">
+        <div className="relative z-20 w-full md:w-[35%] h-[50vh] md:h-auto overflow-hidden">
           <Sidebar />
         </div>
-        <div className="flex-1 relative">
+        <div className="flex-1 relative isolate z-0">
           <CrisisMap />
         </div>
       </div>

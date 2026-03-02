@@ -10,7 +10,7 @@ export function Header() {
   const { dict } = useLocale()
 
   return (
-    <header className="flex items-center gap-4 px-4 h-12 bg-[var(--bg-secondary)] border-b border-[var(--border)] shrink-0">
+    <header className="relative z-40 flex items-center gap-4 px-4 h-12 bg-[var(--bg-secondary)] border-b border-[var(--border)] shrink-0">
       <div className="flex items-center gap-2 shrink-0">
         <span className="text-base font-bold text-[var(--text-primary)]">
           {dict.header.title}
